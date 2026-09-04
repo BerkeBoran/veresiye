@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 
 class CustomerBase(BaseModel):
-    name: str | None = None
+    name: str
     surname: str | None = None
     company_name: str | None = None
     email: str | None = None
@@ -14,6 +14,17 @@ class CustomerBase(BaseModel):
 
 class CustomerCreate(CustomerBase):
     pass
+
+
+class CustomerUpdate(BaseModel):
+    name: str | None = None
+    surname: str | None = None
+    company_name: str | None = None
+    email: str | None = None
+    phone_number: str | None = None
+    tax_number: str | None = None
+    notes: str | None = None
+    address: str | None = None
 
 
 class CustomerRead(CustomerBase):
