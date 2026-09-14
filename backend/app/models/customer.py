@@ -18,3 +18,4 @@ class Customer(Base):
     address = Column(String, nullable=True)
 
     sales = relationship("Sale", back_populates="customer")
+    payments = relationship("Payment", back_populates="customer")
