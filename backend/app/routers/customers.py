@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.customer import Customer
 from app.schemas.customer import CustomerCreate, CustomerRead, CustomerUpdate
+from app.services.customer_service import calculate_balance
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 
@@ -50,3 +51,33 @@ def delete_customer(customer_id: int, db: Session = Depends(get_db)):
     db.delete(customer)
     db.commit()
     return customer
+
+
+@router.get("/{customer_id}/balance")
+def get_customer_balance(customer_id: int, db: Session = Depends(get_db)):
+    customer = db.query(Customer).filter(Customer.id == customer_id).first()
+    if not customer:
+        return HTTPException(status_code=404, detail="Customer not found")
+
+    result = calculate_balance(customer)
+    return {
+        "customer_id": customer_id,
+        **result
+    }
+
+
+@router.get("/{customer_id}/statement")
+def get_customer_statement(customer_id: int, db: Session = Depends(get_db)):
+    customer = db.query(Customer).filter(Customer.id == customer_id).first()
+    if not customer:
+        return HTTPException(status_code=404, detail="Customer not found")
+
+    totals = calculate_balance(customer)
+    return {
+        "customer": customer,
+        "total_sales": totals["total_sales"],
+        "total_payments": totals["total_payments"],
+        "balance": totals["balance"],
+        "sales": customer.sales,
+        "payments": customer.payments
+    }
