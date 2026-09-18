@@ -1,10 +1,12 @@
+import decimal
 from datetime import datetime
 from pydantic import BaseModel
+from decimal import Decimal
 
 
 class PaymentBase(BaseModel):
     customer_id: int
-    amount: float
+    amount: Decimal
     note: str | None = None
 
 

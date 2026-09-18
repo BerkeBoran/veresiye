@@ -3,7 +3,6 @@ from app.database import Base, engine
 from app.models import customer, sale, payment
 from app.routers import customers, sales, payments
 
-Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
