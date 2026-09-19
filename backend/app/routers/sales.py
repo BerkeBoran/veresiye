@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models.customer import Customer
-from app.models.sale import Sale
+from app.models.sale import Sale, SaleItem
 from app.schemas.sale import SaleRead, SaleCreate
-from app.services.sale_service import calculate_sale_totals
+from app.services.sale_service import calculate_sale
 
 router = APIRouter(prefix="/sales", tags=["sales"])
 
@@ -16,14 +16,18 @@ def create_sale(sale: SaleCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Customer not found")
 
 
-    totals = calculate_sale_totals(sale.quantity_kg, sale.unit_price, sale.vat_rate)
+    computed = calculate_sale(sale.items)
 
     new_sale = Sale(
-        **sale.model_dump(),
-        subtotal=totals["subtotal"],
-        vat_amount=totals["vat_amount"],
-        total=totals["total"]
+        customer_id=sale.customer_id,
+        note=sale.note,
+        subtotal=computed["subtotal"],
+        vat_amount=computed["vat_amount"],
+        total=computed["total"]
     )
+
+    for item_data in computed["items"]:
+        new_sale.items.append(SaleItem(**item_data))
 
     db.add(new_sale)
     db.commit()
