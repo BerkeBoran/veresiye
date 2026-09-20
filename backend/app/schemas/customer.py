@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from pydantic import BaseModel
 
 
@@ -32,3 +34,9 @@ class CustomerRead(CustomerBase):
 
     class Config:
         from_attributes = True
+
+
+class CustomerWithBalance(CustomerRead):
+    total_sales: Decimal
+    total_payments: Decimal
+    balance: Decimal
