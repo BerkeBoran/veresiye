@@ -41,3 +41,8 @@ class SaleItemRead(BaseModel):
     line_total: Decimal
     line_vat: Decimal
 
+
+class SaleUpdate(BaseModel):
+    note: str | None = None
+    items: list[SaleItemCreate] = Field(min_length=1)
+

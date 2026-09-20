@@ -9,6 +9,7 @@ from app.models.customer import Customer
 from app.models.payment import Payment
 from app.models.sale import Sale
 from app.schemas.customer import CustomerCreate, CustomerRead, CustomerUpdate, CustomerWithBalance
+from app.schemas.statement import CustomerStatement
 from app.services.customer_service import calculate_balance
 
 router = APIRouter(prefix="/customers", tags=["customers"])
@@ -102,7 +103,7 @@ def get_customer_balance(customer_id: int, db: Session = Depends(get_db)):
     }
 
 
-@router.get("/{customer_id}/statement")
+@router.get("/{customer_id}/statement", response_model=CustomerStatement)
 def get_customer_statement(customer_id: int, db: Session = Depends(get_db)):
     customer = db.query(Customer).filter(Customer.id == customer_id).first()
     if not customer:

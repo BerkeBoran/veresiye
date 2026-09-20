@@ -7,9 +7,9 @@ from decimal import Decimal
 
 
 class CustomerStatement(BaseModel):
-    customer = CustomerRead
+    customer: CustomerRead
     total_sales: Decimal
     total_payments: Decimal
     balance: Decimal
-    sales = list[SaleRead]
-    payments = list[PaymentRead]
+    sales: list[SaleRead]
+    payments: list[PaymentRead]

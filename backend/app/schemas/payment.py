@@ -20,3 +20,8 @@ class PaymentRead(PaymentBase):
 
     class Config:
         from_attributes = True
+
+
+class PaymentUpdate(BaseModel):
+    amount: Decimal | None = None
+    note: str | None = None

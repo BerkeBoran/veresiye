@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.customer import Customer
 from app.models.sale import Sale, SaleItem
-from app.schemas.sale import SaleRead, SaleCreate
+from app.schemas.sale import SaleRead, SaleCreate, SaleUpdate
 from app.services.sale_service import calculate_sale
 
 router = APIRouter(prefix="/sales", tags=["sales"])
@@ -38,3 +38,34 @@ def create_sale(sale: SaleCreate, db: Session = Depends(get_db)):
 @router.get("/", response_model=list[SaleRead])
 def list_sales(db: Session = Depends(get_db)):
     return db.query(Sale).all()
+
+
+@router.delete("/{sale_id}")
+def delete_sale(sale_id: int, db: Session = Depends(get_db)):
+    sale = db.query(Sale).filter(Sale.id == sale_id).first()
+    if not sale:
+        return HTTPException(status_code=404, detail="Sale not found")
+    db.delete(sale)
+    db.commit()
+    return {"Bilgi": "Satış Silindi"}
+
+
+@router.put("/{sale_id}", response_model=SaleRead)
+def update_sale(sale_id: int, payload: SaleUpdate, db: Session = Depends(get_db)):
+    sale = db.query(Sale).filter(Sale.id == sale_id).first()
+    if sale is None:
+        return HTTPException(status_code=404, detail="Sale not found")
+
+    sale.items.clear()
+    computed = calculate_sale(payload.items)
+    sale.note = payload.note
+    sale.subtotal = computed["subtotal"]
+    sale.vat_amount = computed["vat_amount"]
+    sale.total = computed["total"]
+
+    for item_data in computed["items"]:
+        sale.items.append(SaleItem(**item_data))
+
+    db.commit()
+    db.refresh(sale)
+    return sale
