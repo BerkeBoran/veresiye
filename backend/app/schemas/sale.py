@@ -8,6 +8,8 @@ class SaleCreate(BaseModel):
     customer_id: int
     note: str | None = None
     items: list[SaleItemCreate] = Field(min_length=1)
+    document_no: str | None = None
+    vat_exempt: bool = False
 
 
 class SaleRead(BaseModel):
@@ -19,6 +21,8 @@ class SaleRead(BaseModel):
     total: Decimal
     created_at: datetime
     items: list[SaleItemRead]
+    document_no: str | None
+    vat_exempt: bool
 
     class Config:
         from_attributes = True
@@ -45,4 +49,6 @@ class SaleItemRead(BaseModel):
 class SaleUpdate(BaseModel):
     note: str | None = None
     items: list[SaleItemCreate] = Field(min_length=1)
+    document_no: str | None = None
+    vat_exempt: bool = False
 

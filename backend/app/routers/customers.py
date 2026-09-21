@@ -3,6 +3,7 @@ from decimal import Decimal
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
+from fastapi.responses import Response
 
 from app.database import get_db
 from app.models.customer import Customer
@@ -11,6 +12,7 @@ from app.models.sale import Sale
 from app.schemas.customer import CustomerCreate, CustomerRead, CustomerUpdate, CustomerWithBalance
 from app.schemas.statement import CustomerStatement
 from app.services.customer_service import calculate_balance
+from app.services.export_service import build_statement_excel
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 
@@ -118,6 +120,22 @@ def get_customer_statement(customer_id: int, db: Session = Depends(get_db)):
         "sales": customer.sales,
         "payments": customer.payments
     }
+
+
+@router.get("/{customer_id}/statement/excel")
+def statement_excel(customer_id: int, db: Session = Depends(get_db)):
+    customer = db.query(Customer).filter(Customer.id == customer_id).first()
+    if not customer:
+        return HTTPException(status_code=404, detail="Customer not found")
+
+    totals = calculate_balance(customer)
+    content = build_statement_excel(customer, customer.sales, customer.payments, totals)
+
+    return Response(
+        content=content,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="ekstre_{customer_id}.xlsx"'},
+    )
 
 
 

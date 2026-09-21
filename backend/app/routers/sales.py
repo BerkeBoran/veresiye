@@ -16,14 +16,16 @@ def create_sale(sale: SaleCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Customer not found")
 
 
-    computed = calculate_sale(sale.items)
+    computed = calculate_sale(sale.items, vat_exempt=sale.vat_exempt)
 
     new_sale = Sale(
         customer_id=sale.customer_id,
         note=sale.note,
+        vat_exempt=sale.vat_exempt,
         subtotal=computed["subtotal"],
         vat_amount=computed["vat_amount"],
-        total=computed["total"]
+        total=computed["total"],
+        document_no=sale.document_no
     )
 
     for item_data in computed["items"]:
@@ -57,8 +59,10 @@ def update_sale(sale_id: int, payload: SaleUpdate, db: Session = Depends(get_db)
         return HTTPException(status_code=404, detail="Sale not found")
 
     sale.items.clear()
-    computed = calculate_sale(payload.items)
+    computed = calculate_sale(payload.items, vat_exempt=payload.vat_exempt)
     sale.note = payload.note
+    sale.document_no = payload.document_no
+    sale.vat_exempt = payload.vat_exempt
     sale.subtotal = computed["subtotal"]
     sale.vat_amount = computed["vat_amount"]
     sale.total = computed["total"]

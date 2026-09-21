@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, ForeignKey, String, func, DateTime, Numeric
+from sqlalchemy import Column, Integer, ForeignKey, String, func, DateTime, Numeric, Boolean
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -11,6 +11,8 @@ class Sale(Base):
     id = Column(Integer, primary_key=True, index=True)
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
     note = Column(String, nullable=True)
+    document_no = Column(String, nullable=True)
+    vat_exempt = Column(Boolean, nullable=False, default=False, server_default="0")
 
     subtotal = Column(Numeric(12,2), nullable=False)
     vat_amount = Column(Numeric(12,2), nullable=False)

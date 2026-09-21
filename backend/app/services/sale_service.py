@@ -15,14 +15,15 @@ def calculate_line_totals(quantity_kg: Decimal, unit_price: Decimal, vat_rate: D
     }
 
 
-def calculate_sale(items: list) -> dict:
+def calculate_sale(items: list, vat_exempt: bool = False) -> dict:
     computed_items = []
     subtotal_sum = Decimal(0)
     vat_sum = Decimal(0)
     total_sum = Decimal(0)
 
     for item in items:
-        line = calculate_line_totals(item.quantity_kg, item.unit_price, item.vat_rate)
+        rate = Decimal(0) if vat_exempt else item.vat_rate
+        line = calculate_line_totals(item.quantity_kg, item.unit_price, rate)
         computed_items.append({
             "product_name": item.product_name,
             "quantity_kg": item.quantity_kg,
