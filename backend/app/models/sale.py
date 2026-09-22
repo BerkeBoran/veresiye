@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, ForeignKey, String, func, DateTime, Numeric, Boolean
+from sqlalchemy import Column, Integer, ForeignKey, String, func, DateTime, Numeric, Boolean, Date
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -18,6 +18,7 @@ class Sale(Base):
     vat_amount = Column(Numeric(12,2), nullable=False)
     total = Column(Numeric(12,2), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
+    due_date = Column(Date, nullable=True)
 
     transport = Column(Boolean, nullable=True, server_default="0")
     transport_price = Column(Numeric(12,2), nullable=True)

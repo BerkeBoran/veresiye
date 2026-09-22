@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from pydantic import BaseModel, Field
 from decimal import Decimal
@@ -13,6 +13,7 @@ class SaleCreate(BaseModel):
     transport: bool = False
     transport_price: Decimal | None = None
     transport_vat_rate: Decimal = Decimal(20)
+    due_date: date | None = None
 
 
 class SaleRead(BaseModel):
@@ -32,6 +33,7 @@ class SaleRead(BaseModel):
     transport_tevkifat: Decimal
     transport_vat_amount: Decimal
     transport_total: Decimal
+    due_date: date | None
 
     class Config:
         from_attributes = True
@@ -63,3 +65,4 @@ class SaleUpdate(BaseModel):
     transport: bool = False
     transport_price: Decimal | None = None
     transport_vat_rate: Decimal = Decimal(20)
+    due_date: date | None = None
