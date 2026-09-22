@@ -16,7 +16,7 @@ def create_sale(sale: SaleCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Customer not found")
 
 
-    computed = calculate_sale(sale.items, vat_exempt=sale.vat_exempt)
+    computed = calculate_sale(sale.items, vat_exempt=sale.vat_exempt, transport=sale.transport, transport_price=sale.transport_price, transport_vat_rate=sale.transport_vat_rate)
 
     new_sale = Sale(
         customer_id=sale.customer_id,
@@ -25,7 +25,14 @@ def create_sale(sale: SaleCreate, db: Session = Depends(get_db)):
         subtotal=computed["subtotal"],
         vat_amount=computed["vat_amount"],
         total=computed["total"],
-        document_no=sale.document_no
+        document_no=sale.document_no,
+        transport = sale.transport,
+        transport_price=sale.transport_price,
+        transport_vat_rate=sale.transport_vat_rate,
+        transport_tevkifat=computed["transport_tevkifat"],
+        transport_total=computed["transport_total"],
+        transport_vat_amount=computed["transport_vat_amount"],
+
     )
 
     for item_data in computed["items"]:
@@ -63,9 +70,15 @@ def update_sale(sale_id: int, payload: SaleUpdate, db: Session = Depends(get_db)
     sale.note = payload.note
     sale.document_no = payload.document_no
     sale.vat_exempt = payload.vat_exempt
+    sale.transport = payload.transport
+    sale.transport_price = payload.transport_price
+    sale.transport_vat_rate = payload.transport_vat_rate
+    sale.transport_tevkifat = computed["transport_tevkifat"]
     sale.subtotal = computed["subtotal"]
     sale.vat_amount = computed["vat_amount"]
     sale.total = computed["total"]
+    sale.transport_vat_amount = computed["transport_vat_amount"]
+    sale.transport_total = computed["transport_total"]
 
     for item_data in computed["items"]:
         sale.items.append(SaleItem(**item_data))

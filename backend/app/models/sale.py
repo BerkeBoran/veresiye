@@ -19,6 +19,13 @@ class Sale(Base):
     total = Column(Numeric(12,2), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
 
+    transport = Column(Boolean, nullable=True, server_default="0")
+    transport_price = Column(Numeric(12,2), nullable=True)
+    transport_vat_rate = Column(Numeric(5,2), nullable=False, server_default="20")
+    transport_tevkifat = Column(Numeric(12,2), nullable=False, server_default="0")
+    transport_vat_amount = Column(Numeric(12,2), nullable=False, server_default="0")
+    transport_total = Column(Numeric(12,2), nullable=False, server_default="0")
+
     customer = relationship("Customer", back_populates="sales")
     items = relationship("SaleItem", back_populates="sale", cascade="all, delete-orphan")
 

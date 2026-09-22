@@ -10,6 +10,9 @@ class SaleCreate(BaseModel):
     items: list[SaleItemCreate] = Field(min_length=1)
     document_no: str | None = None
     vat_exempt: bool = False
+    transport: bool = False
+    transport_price: Decimal | None = None
+    transport_vat_rate: Decimal = Decimal(20)
 
 
 class SaleRead(BaseModel):
@@ -23,6 +26,12 @@ class SaleRead(BaseModel):
     items: list[SaleItemRead]
     document_no: str | None
     vat_exempt: bool
+    transport: bool
+    transport_price: Decimal | None
+    transport_vat_rate: Decimal
+    transport_tevkifat: Decimal
+    transport_vat_amount: Decimal
+    transport_total: Decimal
 
     class Config:
         from_attributes = True
@@ -51,4 +60,6 @@ class SaleUpdate(BaseModel):
     items: list[SaleItemCreate] = Field(min_length=1)
     document_no: str | None = None
     vat_exempt: bool = False
-
+    transport: bool = False
+    transport_price: Decimal | None = None
+    transport_vat_rate: Decimal = Decimal(20)
