@@ -14,6 +14,7 @@ class SaleCreate(BaseModel):
     transport_price: Decimal | None = None
     transport_vat_rate: Decimal = Decimal(20)
     due_date: date | None = None
+    sale_date: date | None = None
 
 
 class SaleRead(BaseModel):
@@ -34,6 +35,7 @@ class SaleRead(BaseModel):
     transport_vat_amount: Decimal
     transport_total: Decimal
     due_date: date | None
+    sale_date: date | None
 
     class Config:
         from_attributes = True
@@ -66,3 +68,4 @@ class SaleUpdate(BaseModel):
     transport_price: Decimal | None = None
     transport_vat_rate: Decimal = Decimal(20)
     due_date: date | None = None
+    sale_date: date | None = None

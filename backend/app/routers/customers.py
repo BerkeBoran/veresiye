@@ -41,6 +41,7 @@ def customer_with_balances(db: Session = Depends(get_db)):
 
     payments_by_customer = dict(
         db.query(Payment.customer_id, func.sum(Payment.amount))
+        .filter(Payment.direction == "in")
         .group_by(Payment.customer_id)
         .all()
     )
@@ -118,7 +119,7 @@ def get_customer_statement(customer_id: int, db: Session = Depends(get_db)):
         "total_payments": totals["total_payments"],
         "balance": totals["balance"],
         "sales": customer.sales,
-        "payments": customer.payments
+        "payments": [payments for payments in customer.payments if payments.direction == "in" ]
     }
 
 

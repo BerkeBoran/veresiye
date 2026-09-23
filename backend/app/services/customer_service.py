@@ -4,7 +4,7 @@ TWO_PLACES = Decimal('0.01')
 
 def calculate_balance(customer) -> dict:
     total_sales = sum((sale.total for sale in customer.sales), Decimal(0))
-    total_payments = sum((payment.amount for payment in customer.payments), Decimal(0))
+    total_payments = sum((payment.amount for payment in customer.payments if payment.direction == "in"), Decimal(0))
     balance = total_sales - total_payments
 
     return {

@@ -19,6 +19,7 @@ class Sale(Base):
     total = Column(Numeric(12,2), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
     due_date = Column(Date, nullable=True)
+    sale_date = Column(Date, nullable=True)
 
     transport = Column(Boolean, nullable=True, server_default="0")
     transport_price = Column(Numeric(12,2), nullable=True)

@@ -32,7 +32,8 @@ def create_sale(sale: SaleCreate, db: Session = Depends(get_db)):
         transport_tevkifat=computed["transport_tevkifat"],
         transport_total=computed["transport_total"],
         transport_vat_amount=computed["transport_vat_amount"],
-        due_date=sale.due_date
+        due_date=sale.due_date,
+        sale_date=sale.sale_date
 
     )
 
@@ -81,6 +82,7 @@ def update_sale(sale_id: int, payload: SaleUpdate, db: Session = Depends(get_db)
     sale.transport_vat_amount = computed["transport_vat_amount"]
     sale.transport_total = computed["transport_total"]
     sale.due_date = payload.due_date
+    sale.sale_date = payload.sale_date
 
     for item_data in computed["items"]:
         sale.items.append(SaleItem(**item_data))
