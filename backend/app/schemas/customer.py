@@ -39,4 +39,5 @@ class CustomerRead(CustomerBase):
 class CustomerWithBalance(CustomerRead):
     total_sales: Decimal
     total_payments: Decimal
+    total_shipments: Decimal
     balance: Decimal

@@ -19,3 +19,4 @@ class Customer(Base):
 
     sales = relationship("Sale", back_populates="customer")
     payments = relationship("Payment", back_populates="customer")
+    shipments = relationship("Shipment", back_populates="customer")

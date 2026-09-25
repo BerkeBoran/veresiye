@@ -9,6 +9,7 @@ from app.database import get_db
 from app.models.customer import Customer
 from app.models.payment import Payment
 from app.models.sale import Sale
+from app.models.shipment import Shipment
 from app.schemas.customer import CustomerCreate, CustomerRead, CustomerUpdate, CustomerWithBalance
 from app.schemas.statement import CustomerStatement
 from app.services.customer_service import calculate_balance
@@ -46,16 +47,24 @@ def customer_with_balances(db: Session = Depends(get_db)):
         .all()
     )
 
+    shipments_by_customer = dict(
+        db.query(Shipment.customer_id, func.sum(Shipment.total))
+        .group_by(Shipment.customer_id)
+        .all()
+    )
+
     result = []
     for customer in db.query(Customer).all():
         total_sales = sales_by_customer.get(customer.id, Decimal(0))
         total_payments = payments_by_customer.get(customer.id, Decimal(0))
+        total_shipments = shipments_by_customer.get(customer.id, Decimal(0))
         result.append(
             CustomerWithBalance(
                 **CustomerRead.model_validate(customer).model_dump(),
                 total_sales=total_sales,
                 total_payments=total_payments,
-                balance=total_sales - total_payments,
+                total_shipments=total_shipments,
+                balance=total_sales + total_shipments - total_payments,
             )
         )
     return result
@@ -117,8 +126,10 @@ def get_customer_statement(customer_id: int, db: Session = Depends(get_db)):
         "customer": customer,
         "total_sales": totals["total_sales"],
         "total_payments": totals["total_payments"],
+        "total_shipments": totals["total_shipments"],
         "balance": totals["balance"],
         "sales": customer.sales,
+        "shipments": customer.shipments,
         "payments": [payments for payments in customer.payments if payments.direction == "in" ]
     }
 
