@@ -1,6 +1,9 @@
+from datetime import date
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.core.filters import filter_by_date_range
 from app.database import get_db
 from app.models.daily_sale import DailySale
 from app.schemas.daily_sale import DailySaleRead, DailySaleCreate, DailySaleUpdate
@@ -27,12 +30,9 @@ def create_daily_sale(payload: DailySaleCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[DailySaleRead])
-def list_daily_sales(db: Session = Depends(get_db)):
-    return (
-        db.query(DailySale)
-        .order_by(DailySale.sale_date.desc(), DailySale.id.desc())
-        .all()
-    )
+def list_daily_sales(date_from: date | None = None, date_to: date | None = None,db: Session = Depends(get_db)):
+    query = filter_by_date_range(db.query(DailySale), DailySale.sale_date, date_from, date_to)
+    return (query.order_by(DailySale.sale_date.desc(), DailySale.id.desc()).all())
 
 
 @router.put("/{daily_sale_id}", response_model=DailySaleRead)

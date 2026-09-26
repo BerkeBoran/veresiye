@@ -1,9 +1,11 @@
+from datetime import date
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from app.core.filters import filter_by_date_range
 from app.database import get_db
 from app.models.customer import Customer
 from app.models.payment import Payment
@@ -25,14 +27,15 @@ def create_payment(payment: PaymentCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[PaymentRead])
-def get_payments(direction: str | None = None,db: Session = Depends(get_db)):
-    db.query(Payment).all()
+def get_payments(direction: str | None = None, date_from: date | None = None, date_to: date | None = None, db: Session = Depends(get_db)):
+    query = db.query(Payment)
     if direction:
-        return db.query(Payment).filter(Payment.direction == direction).all()
-    return db.query(Payment).all()
+        query = query.filter(Payment.direction == direction)
+    query = filter_by_date_range(query, Payment.payment_date, date_from, date_to)
+    return query.order_by(Payment.payment_date.desc(), Payment.id.desc()).all()
 
 
-@router.get("/{summary}", response_model=CaseSummary)
+@router.get("/summary", response_model=CaseSummary)
 def payments_summary(db: Session = Depends(get_db)):
     types = ["cash", "transfer", "cheque"]
     by_type = []

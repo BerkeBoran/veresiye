@@ -1,3 +1,5 @@
+from datetime import date
+
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
@@ -6,7 +8,7 @@ from app.models.customer import Customer
 from app.models.sale import Sale, SaleItem
 from app.schemas.sale import SaleRead, SaleCreate, SaleUpdate
 from app.services.sale_service import calculate_sale
-
+from app.core.filters import filter_by_date_range
 router = APIRouter(prefix="/sales", tags=["sales"])
 
 @router.post("/", response_model=SaleRead)
@@ -47,8 +49,9 @@ def create_sale(sale: SaleCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=list[SaleRead])
-def list_sales(db: Session = Depends(get_db)):
-    return db.query(Sale).all()
+def list_sales(date_from: date | None = None, date_to: date | None = None, db: Session = Depends(get_db)):
+    query = filter_by_date_range(db.query(Sale), Sale.sale_date, date_from, date_to)
+    return query.order_by(Sale.sale_date.desc(), Sale.id.desc()).all()
 
 
 @router.delete("/{sale_id}")

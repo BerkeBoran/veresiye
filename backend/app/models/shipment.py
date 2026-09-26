@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, Numeric, ForeignKey, DateTime, func
+from sqlalchemy import Column, Integer, String, Boolean, Numeric, ForeignKey, DateTime, func, Date
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -11,7 +11,7 @@ class Shipment(Base):
     customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
 
     place_of_shipment = Column(String, nullable=True)
-    shipment_date = Column(String, nullable=True)
+    shipment_date = Column(Date, nullable=True)
     number_plate = Column(String, nullable=True)
 
     vat_exempt = Column(Boolean, nullable=False, default=False, server_default="0")
