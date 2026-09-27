@@ -71,7 +71,13 @@ def update_sale(sale_id: int, payload: SaleUpdate, db: Session = Depends(get_db)
         return HTTPException(status_code=404, detail="Sale not found")
 
     sale.items.clear()
-    computed = calculate_sale(payload.items, vat_exempt=payload.vat_exempt)
+    computed = calculate_sale(
+        payload.items,
+        vat_exempt=payload.vat_exempt,
+        transport=payload.transport,
+        transport_price=payload.transport_price,
+        transport_vat_rate=payload.transport_vat_rate,
+    )
     sale.note = payload.note
     sale.document_no = payload.document_no
     sale.vat_exempt = payload.vat_exempt
