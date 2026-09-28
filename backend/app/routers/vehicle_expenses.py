@@ -28,9 +28,17 @@ def apply_expense_totals(expense: VehicleExpense) -> None:
         setattr(expense, field, value)
 
 
+def check_partner(db: Session, vehicle_id: int, paid_by: str):
+    if paid_by == "partner":
+        vehicle = db.get(Vehicle, vehicle_id)
+        if vehicle is not None and vehicle.partner_name is None:
+            raise HTTPException(status_code=400, detail="Bu aracın ortağı yok")
+
+
 @router.post("/", response_model=VehicleExpenseRead, status_code=201)
 def create_expense(payload: VehicleExpenseCreate, db: Session = Depends(get_db)):
     ensure_vehicle(db, payload.vehicle_id)
+    check_partner(db, payload.vehicle_id, payload.paid_by)
     expense = VehicleExpense(**payload.model_dump())
     apply_expense_totals(expense)
     db.add(expense)
@@ -66,6 +74,8 @@ def update_expense(expense_id: int, payload: VehicleExpenseUpdate, db: Session =
         ensure_vehicle(db, data["vehicle_id"])
     for field, value in data.items():
         setattr(expense, field, value)
+
+    check_partner(db, expense.vehicle_id, expense.paid_by)
 
     apply_expense_totals(expense)
     db.commit()

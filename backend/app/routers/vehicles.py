@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.filters import filter_by_date_range
 from app.database import get_db
+from app.models.partner_payment import PartnerPayment
 from app.models.trip import Trip
 from app.models.vehicle import Vehicle
 from app.models.vehicle_expense import VehicleExpense
@@ -29,7 +30,10 @@ def load_vehicle_records(db: Session, vehicle_id: int, date_from: date | None, d
     expenses_query = db.query(VehicleExpense).filter(VehicleExpense.vehicle_id == vehicle_id)
     expenses = filter_by_date_range(expenses_query, VehicleExpense.expense_date, date_from, date_to).all()
 
-    return trips, expenses
+    payment_query = db.query(PartnerPayment).filter(PartnerPayment.vehicle_id == vehicle_id)
+    partner_payments = filter_by_date_range(payment_query, PartnerPayment.payment_date, date_from, date_to).all()
+
+    return trips, expenses, partner_payments
 
 
 
@@ -51,12 +55,13 @@ def fleet_summary(date_from: date | None = None, date_to: date | None = None, db
     vehicles = db.query(Vehicle).order_by(Vehicle.number_plate).all()
     result = []
     for vehicle in vehicles:
-        trips, expenses = load_vehicle_records(db, vehicle.id, date_from, date_to)
-        summary = calculate_vehicle_summary(trips, expenses)
+        trips, expenses, partner_payments = load_vehicle_records(db, vehicle.id, date_from, date_to)
+        summary = calculate_vehicle_summary(trips, expenses, partner_payments)
         result.append({
             "vehicle_id": vehicle.id,
             "number_plate": vehicle.number_plate,
             "is_active": vehicle.is_active,
+            "partner_name": vehicle.partner_name,
             **summary
         })
     return result
@@ -78,9 +83,9 @@ def list_vehicles(active_only: bool = False, db: Session = Depends(get_db)):
 @router.get("/{vehicle_id}/summary")
 def vehicle_summary(vehicle_id: int, date_from: date | None = None, date_to: date | None = None, db: Session = Depends(get_db)):
     vehicle = get_vehicle_or_404(db, vehicle_id)
-    trips, expenses = load_vehicle_records(db, vehicle.id, date_from, date_to)
-    summary = calculate_vehicle_summary(trips, expenses)
-    return {"vehicle_id": vehicle.id, "number_plate": vehicle.number_plate, **summary,}
+    trips, expenses, partner_payments = load_vehicle_records(db, vehicle.id, date_from, date_to)
+    summary = calculate_vehicle_summary(trips, expenses, partner_payments)
+    return {"vehicle_id": vehicle.id, "number_plate": vehicle.number_plate, "partner_name": vehicle.partner_name, **summary,}
 
 
 @router.patch("/{vehicle_id}", response_model=VehicleRead)
@@ -100,7 +105,7 @@ def update_vehicle(vehicle_id: int, payload: VehicleUpdate, db: Session = Depend
 @router.delete("/{vehicle_id}")
 def delete_vehicle(vehicle_id: int, db: Session = Depends(get_db)):
     vehicle = get_vehicle_or_404(db, vehicle_id)
-    if vehicle.trips or vehicle.vehicle_expenses:
-        raise HTTPException(status_code=409, detail="Aracın sefer veya gider kaydı var")
+    if vehicle.trips or vehicle.vehicle_expenses or vehicle.partner_payments:
+        raise HTTPException(status_code=409, detail="Aracın sefer, gider veya ortak ödemesi kaydı var")
     db.delete(vehicle)
     db.commit()

@@ -17,6 +17,7 @@ def normalize_plate(value: str) -> str:
 class VehicleBase(BaseModel):
     number_plate: str
     notes: str | None = None
+    partner_name: str | None = None
 
     @field_validator("number_plate")
     @classmethod
@@ -32,6 +33,7 @@ class VehicleUpdate(BaseModel):
     number_plate: str | None = None
     notes: str | None = None
     is_active: bool | None = None
+    partner_name: str | None = None
 
     @field_validator("number_plate")
     @classmethod

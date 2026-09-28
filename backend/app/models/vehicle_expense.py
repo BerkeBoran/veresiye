@@ -12,6 +12,7 @@ class VehicleExpense(Base):
 
     expense_date = Column(Date, nullable=False)
     category = Column(String, nullable=False)
+    paid_by = Column(String, nullable=False, server_default="us")
     vat_exempt = Column(Boolean, nullable=False, server_default="0")
     vat_rate = Column(Numeric(5,2), nullable=False, server_default="20")
     subtotal = Column(Numeric(12,2), nullable=False)

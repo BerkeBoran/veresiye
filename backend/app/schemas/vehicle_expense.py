@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import Field, BaseModel, ConfigDict
 
 ExpenseCategory = Literal["fuel", "maintenance", "tire", "insurance", "inspection", "tax", "toll", "driver", "other"]
+PaidBy = Literal["us", "partner"]
 
 
 class VehicleExpenseBase(BaseModel):
@@ -15,6 +16,7 @@ class VehicleExpenseBase(BaseModel):
     vat_exempt: bool = False
     vat_rate: Decimal = Decimal("20")
     notes: str | None = None
+    paid_by: PaidBy = "us"
 
 
 class VehicleExpenseCreate(VehicleExpenseBase):
@@ -29,6 +31,7 @@ class VehicleExpenseUpdate(BaseModel):
     vat_exempt: bool | None = None
     vat_rate: Decimal | None = None
     notes: str | None = None
+    paid_by: PaidBy | None = None
 
 
 class VehicleExpenseRead(VehicleExpenseBase):

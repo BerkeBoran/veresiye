@@ -18,10 +18,14 @@ def calculate_expense(total: Decimal, vat_exempt: bool, vat_rate: Decimal) -> di
     }
 
 
-def calculate_vehicle_summary(trips: list, expenses: list) -> dict:
+def calculate_vehicle_summary(trips: list, expenses: list, partnet_payments: list) -> dict:
     total_income = sum((trip.total for trip in trips), Decimal(0))
     total_expense = sum((expense.total for expense in expenses), Decimal(0))
     net = total_income - total_expense
+
+    our_expense = sum((expense.total for expense in expenses if expense.paid_by == "us"), Decimal(0))
+    partner_expense = sum((expense.total for expense in expenses if expense.paid_by == "partner"), Decimal(0))
+    partner_payments_total = sum((payment.amount for payment in partnet_payments), Decimal(0))
 
     total_kg = sum((trip.kg for trip in trips), Decimal(0))
 
@@ -53,5 +57,8 @@ def calculate_vehicle_summary(trips: list, expenses: list) -> dict:
         "total_expense": total_expense.quantize(Decimal("0.01")),
         "net": net.quantize(Decimal("0.01")),
         "expenses_by_category": expenses_by_category,
+        "our_expense": our_expense.quantize(Decimal("0.01")),
+        "partner_expense": partner_expense.quantize(Decimal("0.01")),
+        "partner_payments_total": partner_payments_total.quantize(Decimal("0.01")),
     }
 
