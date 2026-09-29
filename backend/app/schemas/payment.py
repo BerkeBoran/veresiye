@@ -5,7 +5,8 @@ from decimal import Decimal
 
 
 class PaymentBase(BaseModel):
-    customer_id: int
+    customer_id: int | None = None
+    supplier_id: int | None = None
     amount: Decimal
     note: str | None = None
     payment_date: date | None = None

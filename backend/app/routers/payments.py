@@ -9,15 +9,28 @@ from app.core.filters import filter_by_date_range
 from app.database import get_db
 from app.models.customer import Customer
 from app.models.payment import Payment
+from app.models.supplier import Supplier
 from app.schemas.payment import PaymentRead, PaymentCreate, PaymentUpdate, CaseSummary, TypeSummary
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
 @router.post("/", response_model=PaymentRead)
 def create_payment(payment: PaymentCreate, db: Session = Depends(get_db)):
-    customer = db.query(Customer).filter(Customer.id == payment.customer_id).first()
-    if customer is None:
-        raise HTTPException(status_code=404, detail="Customer not found")
+    if payment.customer_id is None and payment.supplier_id is None:
+        raise HTTPException(status_code=400, detail="Ödeme bir müşteriye ya da tedarikçiye ait olmalı.")
+
+    if payment.customer_id is not None and payment.supplier_id is not None:
+        raise HTTPException(status_code=400, detail="Ödeme aynı anda hem müşteriye hemde tedarikçiye ait olamaz.")
+
+    if payment.customer_id is not None:
+        customer = db.query(Customer).filter(Customer.id == payment.customer_id).first()
+        if customer is None:
+            raise HTTPException(status_code=404, detail="Müşteri bulunamadı.")
+
+    if payment.supplier_id is not None:
+        supplier = db.query(Supplier).filter(Supplier.id == payment.supplier_id).first()
+        if supplier is None:
+            raise HTTPException(status_code=404, detail="Tedarikçi bulunamadı.")
 
     new_payment = Payment(**payment.model_dump())
     db.add(new_payment)

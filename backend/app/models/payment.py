@@ -8,7 +8,8 @@ class Payment(Base):
     __tablename__ = "payments"
 
     id = Column(Integer, primary_key=True, index=True)
-    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False)
+    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=True)
+    supplier_id = Column(Integer, ForeignKey("suppliers.id"), nullable=True)
     amount = Column(Numeric(12,2), nullable=False)
     note = Column(String, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
@@ -20,3 +21,4 @@ class Payment(Base):
     cheque_due_date = Column(Date, nullable=True)
 
     customer = relationship("Customer", back_populates="payments")
+    supplier = relationship("Supplier", back_populates="payments")
