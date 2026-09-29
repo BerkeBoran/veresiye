@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     supabase_service_key: SecretStr
     backup_bucket: str = "backups"
     backup_keep_days: int = 30
+    backup_hour: int = 18
     database_path: Path = BACKEND_DIR / "veresiye.db"
 
 
