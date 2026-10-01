@@ -60,13 +60,13 @@ def start_server() -> uvicorn.Server:
 class Api:
 
 
-    def save_file(self, file_name: str, data_base64: str) -> None:
+    def save_file(self, file_name: str, data_base64: str) -> str | None:
         desktop = Path.home() / "Desktop"
         result = webview.windows[0].create_file_dialog(
             webview.FileDialog.SAVE,
             directory=str(desktop if desktop.exists() else Path.home()),
             save_filename=file_name,
-            file_types=("Excel dosyası (*.xlsx",),
+            file_types=("Excel dosyası (*.xlsx)",),
         )
         if not result:
             return None
