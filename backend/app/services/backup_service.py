@@ -17,6 +17,8 @@ last_status = {"time": None, "ok": None, "message": None}
 
 
 def get_supabase() -> Client:
+    if not settings.backup_enabled:
+        raise RuntimeError("Yedekleme ayarlanmamış: .env dosyasında SUPABASE bilgileri yok")
     return create_client(settings.supabase_url, settings.supabase_service_key.get_secret_value())
 
 

@@ -1,7 +1,6 @@
 from datetime import datetime
-from http.client import HTTPException
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from app.core.config import settings
 from app.services.backup_service import list_backups, last_scheduled_time, last_status, latest_backup_time, \
