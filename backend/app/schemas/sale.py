@@ -4,6 +4,24 @@ from pydantic import BaseModel, Field
 from decimal import Decimal
 
 
+class SaleItemCreate(BaseModel):
+    product_name: str
+    quantity_kg: Decimal
+    unit_price: Decimal
+    vat_rate: Decimal = Decimal(0)
+
+
+class SaleItemRead(BaseModel):
+    id: int
+    product_name: str
+    quantity_kg: Decimal
+    unit_price: Decimal
+    vat_rate: Decimal
+    line_subtotal: Decimal
+    line_total: Decimal
+    line_vat: Decimal
+
+
 class SaleCreate(BaseModel):
     customer_id: int
     note: str | None = None
@@ -39,24 +57,6 @@ class SaleRead(BaseModel):
 
     class Config:
         from_attributes = True
-
-
-class SaleItemCreate(BaseModel):
-    product_name: str
-    quantity_kg: Decimal
-    unit_price: Decimal
-    vat_rate: Decimal = Decimal(0)
-
-
-class SaleItemRead(BaseModel):
-    id: int
-    product_name: str
-    quantity_kg: Decimal
-    unit_price: Decimal
-    vat_rate: Decimal
-    line_subtotal: Decimal
-    line_total: Decimal
-    line_vat: Decimal
 
 
 class SaleUpdate(BaseModel):
